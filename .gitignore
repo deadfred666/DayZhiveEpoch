@@ -3,3 +3,5 @@
 *.opensdf
 *.vcxproj
 Dependencies10/
+*.sublime-project
+*.sublime-workspace
