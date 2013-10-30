@@ -24,6 +24,7 @@ DirectHiveApp::DirectHiveApp(string suffixDir) : HiveExtApp(suffixDir) {}
 #include "HiveLib/DataSource/SqlCharDataSource.h"
 #include "HiveLib/DataSource/SqlObjDataSource.h"
 #include "HiveLib/DataSource/SqlDataSourceCustom.h"
+#include "HiveLib/DataSource/SqlCustomLoadoutSource.h"
 
 bool DirectHiveApp::initialiseService()
 {
@@ -51,11 +52,17 @@ bool DirectHiveApp::initialiseService()
 		_charData.reset(new SqlCharDataSource(logger(),_charDb,charDBConf->getString("IDField",defaultID),charDBConf->getString("WSField",defaultWS)));	
 	}
 
-	Poco::AutoPtr<Poco::Util::AbstractConfiguration> objDBConf(config().createView("ObjectDB"));
+	//pass db to custom loadout datasource
+	{
+		_customLoadoutData.reset(new SqlCustomLoadoutSource(logger(), _objDb));
+	}
 
+	//pass db to custom datasource
 	{
 		_customData.reset(new SqlCustDataSource(logger(), _objDb));
 	}
+
+	Poco::AutoPtr<Poco::Util::AbstractConfiguration> objDBConf(config().createView("ObjectDB"));
 
 	bool useExternalObjDb = objDBConf->getBool("Use",false);
 	if (useExternalObjDb)

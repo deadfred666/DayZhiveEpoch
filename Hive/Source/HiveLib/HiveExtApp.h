@@ -25,6 +25,7 @@
 #include "DataSource/CharDataSource.h"
 #include "DataSource/ObjDataSource.h"
 #include "DataSource/DataSourceCustom.h"
+#include "DataSource/CustomLoadoutSource.h"
 
 #include <boost/function.hpp>
 #include <boost/date_time.hpp>
@@ -50,6 +51,7 @@ protected:
 	unique_ptr<CharDataSource> _charData;
 	unique_ptr<ObjDataSource> _objData;
 	unique_ptr<CustomDataSource> _customData;
+	unique_ptr<CustomLoadoutSource> _customLoadoutData;
 private:
 	int _serverId;
 	boost::posix_time::time_duration _timeOffset;
@@ -62,6 +64,7 @@ private:
 
 	ObjDataSource::ServerObjectsQueue _srvObjects;
 	CustomDataSource::CustomDataQueue _custQueue;
+
 	Sqf::Value streamObjects(Sqf::Parameters params);
 
 	Sqf::Value objectPublish(Sqf::Parameters params);
@@ -87,4 +90,7 @@ private:
 	Sqf::Value streamCustom(Sqf::Parameters params);
 	
 	Sqf::Value customExecute(Sqf::Parameters params);
+
+	Sqf::Value defaultLoadout(Sqf::Parameters params);
+	Sqf::Value individualPlayerLoadout(Sqf::Parameters params);
 };

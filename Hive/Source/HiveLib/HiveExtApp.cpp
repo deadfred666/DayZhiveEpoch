@@ -90,8 +90,14 @@ HiveExtApp::HiveExtApp(string suffixDir) : AppServer("HiveExt",suffixDir), _serv
 	handlers[203] = boost::bind(&HiveExtApp::playerInit,this,_1);
 	
 	// Custom procedures
+	// Leaving for 1.0.2.4 and 1.0.2.5 due to previously adopted code
+	// We'll disable this on the next version
 	handlers[998] = boost::bind(&HiveExtApp::customExecute, this, _1);
 	handlers[999] = boost::bind(&HiveExtApp::streamCustom, this, _1);
+
+	// Custom Default Inventory
+	handlers[600] = boost::bind(&HiveExtApp::defaultLoadout, this, _1);
+	handlers[601] = boost::bind(&HiveExtApp::individualPlayerLoadout, this, _1);
 }
 
 #include <boost/lexical_cast.hpp>
@@ -273,6 +279,19 @@ Sqf::Value HiveExtApp::objectPublish( Sqf::Parameters params )
 	Int64 uniqueId = Sqf::GetBigInt(params.at(8));
 
 	return booleanReturn(_objData->createObject(getServerId(),className,damage,characterId,worldSpace,inventory,hitPoints,fuel,uniqueId));
+}
+
+#include "DataSource/CustomLoadoutSource.h"
+
+Sqf::Value HiveExtApp::defaultLoadout( Sqf::Parameters params )
+{
+	return _customLoadoutData->fetchDefaultLoadout(getServerId());
+}
+
+Sqf::Value HiveExtApp::individualPlayerLoadout( Sqf::Parameters params )
+{
+	int playerUid = Sqf::GetIntAny(params.at(0));
+	return _customLoadoutData->fetchPlayerLoadout(getServerId(), playerUid);
 }
 
 #include "DataSource/CharDataSource.h"
