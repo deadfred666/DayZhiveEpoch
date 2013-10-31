@@ -30,7 +30,7 @@ SqlCustomLoadoutSource::SqlCustomLoadoutSource( Poco::Logger& logger, shared_ptr
 
 SqlCustomLoadoutSource::~SqlCustomLoadoutSource() {}
 
-Sqf::Value SqlCustomDataSource::fetchDefaultLoadout( int serverId )
+Sqf::Value SqlCustomLoadoutSource::fetchDefaultLoadout( int serverId )
 {
 	Sqf::Parameters retVal;
 
@@ -76,7 +76,7 @@ Sqf::Value SqlCustomDataSource::fetchDefaultLoadout( int serverId )
 	return retVal;
 }
 
-Sqf::Value SqlCustomDataSource::fetchPlayerLoadout( int serverId, int playerUid )
+Sqf::Value SqlCustomLoadoutSource::fetchPlayerLoadout( int serverId, int playerUid )
 {
 	Sqf::Parameters retVal;
 
