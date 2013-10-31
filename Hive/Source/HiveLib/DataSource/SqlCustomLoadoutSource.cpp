@@ -24,8 +24,54 @@
 using boost::lexical_cast;
 using boost::bad_lexical_cast;
 
-SqlCustomLoadoutSource::SqlCustomLoadoutSource( Poco::Logger& logger, shared_ptr<Database> db, const string& idFieldName ) : SqlDataSource(logger,db)
+SqlCustomLoadoutSource::SqlCustomLoadoutSource( Poco::Logger& logger, shared_ptr<Database> db ) : SqlDataSource(logger,db)
 {
 }
 
 SqlCustomLoadoutSource::~SqlCustomLoadoutSource() {}
+
+Sqf::Value SqlCharDataSource::fetchDefaultLoadout( int serverId )
+{
+	Sqf::Parameters retVal;
+
+	auto defLoadoutRes = getDB()->queryParams(
+		"SELECT `Inventory`, `Backpack` FROM `Default_LOADOUT` WHERE `InstanceID` = %d", serverId );
+
+	Sqf::Value inventory = lexical_cast<Sqf::Value>("[]");
+	Sqf::Value backpack = lexical_cast<Sqf::Value>("[]");
+
+	if (defLoadoutRes && defLoadoutRes->fetchRow())
+	{
+		if (!defLoadoutRes->at(0).isNull())
+		{
+			try
+			{
+				inventory = lexical_cast<Sqf::Value>(defLoadoutRes->at(0).getString());
+			}
+			catch (bad_lexical_cast)
+			{
+				_logger.warning("Invalid default inventory for InstanceID("+lexical_cast<string>(serverId)+"): "+defLoadoutRes->at(0).getString());
+			}
+		}
+		if (!defLoadoutRes->at(1).isNull())
+		{
+			try
+			{
+				backpack = lexical_cast<Sqf::Value>(defLoadoutRes->at(1).getString());
+			}
+			catch (bad_lexical_cast)
+			{
+				_logger.warning("Invalid default backpack for InstanceID("+lexical_cast<string>(serverId)+"): "+defLoadoutRes->at(1).getString());
+			}
+		}
+		retVal.push_back(string("PASS"));
+		retVal.push_back(inventory);
+		retVal.push_back(backpack);
+	}
+	else
+	{
+		retVal.push_back(string("ERROR"));
+	}
+
+	return retVal;
+}
