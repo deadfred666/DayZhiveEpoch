@@ -30,7 +30,7 @@ SqlCustomLoadoutSource::SqlCustomLoadoutSource( Poco::Logger& logger, shared_ptr
 
 SqlCustomLoadoutSource::~SqlCustomLoadoutSource() {}
 
-Sqf::Value SqlCharDataSource::fetchDefaultLoadout( int serverId )
+Sqf::Value SqlCustomDataSource::fetchDefaultLoadout( int serverId )
 {
 	Sqf::Parameters retVal;
 
@@ -73,5 +73,60 @@ Sqf::Value SqlCharDataSource::fetchDefaultLoadout( int serverId )
 		retVal.push_back(string("ERROR"));
 	}
 
+	return retVal;
+}
+
+Sqf::Value SqlCustomDataSource::fetchPlayerLoadout( int serverId, int playerUid )
+{
+	Sqf::Parameters retVal;
+
+	auto plrLoadoutRes = getDB()->queryParams(
+		"SELECT `CLT`.`Inventory`, `CLT`.`Backpack`, `CLT`.`Model` FROM `Custom_Loadout_TYPES` AS `CLT` JOIN `Custom_Loadout_PLAYERS` AS `CLP` ON `CLP`.`LoadoutID` = `CLT`.`ID` WHERE `CLP`.`PlayerUID` =  %d", playerUid);
+
+	Sqf::Value inventory = lexical_cast<Sqf::Value>("[]");
+	Sqf::Value backpack = lexical_cast<Sqf::Value>("[]");
+	string model = "";
+
+	if (plrLoadoutRes && plrLoadoutRes->fetchRow())
+	{
+		if (!plrLoadoutRes->at(0).isNull())
+		{
+			try
+			{
+				inventory = lexical_cast<Sqf::Value>(plrLoadoutRes->at(0).getString());
+			}
+			catch (bad_lexical_cast)
+			{
+				_logger.warning("Invalid custom inventory for PlayerUID("+lexical_cast<string>(playerUid)+"): "+plrLoadoutRes->at(0).getString());
+			}
+		}
+		if (!plrLoadoutRes->at(1).isNull())
+		{
+			try
+			{
+				backpack = lexical_cast<Sqf::Value>(plrLoadoutRes->at(1).getString());
+			}
+			catch (bad_lexical_cast)
+			{
+				_logger.warning("Invalid custom backpack for PlayerUID("+lexical_cast<string>(playerUid)+"): "+plrLoadoutRes->at(1).getString());
+			}
+		}
+		try
+		{
+			model = boost::get<string>(lexical_cast<Sqf::Value>(plrLoadoutRes->at(2).getString()));
+		}
+		catch(...)
+		{
+			model = plrLoadoutRes->at(2).getString();
+		}
+		retVal.push_back(string("PASS"));
+		retVal.push_back(inventory);
+		retVal.push_back(backpack);
+		retVal.push_back(model);
+	}
+	else
+	{
+		retVal.push_back(string("ERROR"));
+	}
 	return retVal;
 }
