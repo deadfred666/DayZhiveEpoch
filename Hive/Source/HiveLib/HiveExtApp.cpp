@@ -97,6 +97,7 @@ HiveExtApp::HiveExtApp(string suffixDir) : AppServer("HiveExt",suffixDir), _serv
 
 	// Custom Default Inventory
 	handlers[600] = boost::bind(&HiveExtApp::defaultLoadout, this, _1);
+	// Custom individual player loadout
 	handlers[601] = boost::bind(&HiveExtApp::individualPlayerLoadout, this, _1);
 }
 

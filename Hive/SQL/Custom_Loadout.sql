@@ -6,15 +6,28 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- ----------------------------
--- Table structure for `Default_LOADOUT`
--- ----------------------------
+# Dump of table Custom_Loadout_TYPES
+# ------------------------------------------------------------
 
-CREATE TABLE `Default_LOADOUT` (
-  `InstanceID` bigint(20) unsigned NOT NULL,
+CREATE TABLE `Custom_Loadout_TYPES` (
+  `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Inventory` varchar(2048) NOT NULL DEFAULT '[]',
   `Backpack` varchar(2048) NOT NULL DEFAULT '["DZ_Patrol_Pack_EP1",[[],[]],[[],[]]]',
-  PRIMARY KEY (`InstanceID`)
+  `Model` varchar(100) DEFAULT 'Survivor2_DZ',
+  `Description` varchar(1024) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+# Dump of table Custom_Loadout_PLAYERS
+# ------------------------------------------------------------
+
+CREATE TABLE `Custom_Loadout_PLAYERS` (
+  `PlayerUID` varchar(128) NOT NULL,
+  `LoadoutID` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`PlayerUID`),
+  KEY `CustLoadoutType` (`LoadoutID`),
+  CONSTRAINT `CustLoadoutType` FOREIGN KEY (`LoadoutID`) REFERENCES `Custom_Loadout_TYPES` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
